@@ -1,0 +1,44 @@
+SELECT COUNT(DISTINCT(PersonID))
+FROM Person;
+
+
+SELECT COUNT(PersonID)
+FROM Person 
+WHERE Location = "New York";
+
+
+WITH temp(ItemID, NumCategories) AS (
+    SELECT ItemID, COUNT(ItemID)
+    FROM Category
+    GROUP BY ItemID
+)
+
+SELECT COUNT(ItemID) 
+FROM temp 
+WHERE NumCategories = 4;
+
+
+WITH temp(HighPrice) AS (
+    SELECT MAX(Currently)
+    FROM Item)
+
+SELECT Item.ItemID 
+FROM Item, temp
+WHERE Item.Currently = temp.HighPrice;
+
+
+SELECT COUNT(PersonID)
+FROM Person 
+WHERE Rating > 1000 
+AND NumItemsSelling > 0;
+
+
+SELECT COUNT(PersonID)
+FROM Person 
+WHERE NumItemsBidding > 0
+AND NumItemsSelling > 0;
+
+
+SELECT COUNT(DISTINCT(C.Category))
+FROM Category as C JOIN Bid as B ON (C.ItemID = B.ItemID)
+WHERE B.Amount > 100;
