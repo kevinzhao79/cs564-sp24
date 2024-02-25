@@ -1,0 +1,7 @@
+.separator "|"
+.import Seller.dat Seller
+.import Item.dat Item
+.import Bid.dat Bid
+.import Category.dat Category
+.import Person.dat Person
+update Item set BuyPrice = null where BuyPrice = 'NULL'

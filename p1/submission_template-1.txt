@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+<pset>
+
+    <!--
+        CS 564, SPRING 2024
+        HOMEWORK 1 SUBMISSION TEMPLATE
+
+        Please copy and paste your SQL queries into the appropriate spots below. 
+
+        When submitting SQL queries, please do not include the initial 
+        %sql or %%sql IPython commands. Just include the SQL code.
+
+        DO NOT DELETE THE <![CDATA[ ... ]]> LINES IN EACH <answer> TAG!
+        Doing so will break the autograder. To avoid accidentally breaking
+        something, please leave all existing comments in this template
+        intact in your submission.
+    -->
+
+    <student>
+        <name>
+            <!-- Insert your full name on the line below. -->
+            Kevin Zhao
+        </name>
+        <studentid>
+            <!-- Insert your student ID number below. -->
+            9084829093
+        </studentid>
+    </student>
+
+
+    <!-- BEGIN PROBLEM 1 -->
+    <answer number="1a">
+        <!-- Paste your solution to problem 1, part (a) below this line. --><![CDATA[
+
+            SELECT A.i, A.j, (A.val + B.val) AS val from A, B WHERE (A.i = B.i) AND (A.j = B.j)
+
+        ]]><!-- End problem 1, part (a). -->
+    </answer>
+    <answer number="1b">
+        <!-- Paste your solution to problem 1, part (b) below this line. --><![CDATA[
+
+            SELECT sum(A.val * B.val) AS DotProduct FROM A, B WHERE A.i = B.i AND A.j = 1 AND B.j = 2
+
+        ]]><!-- End problem 1, part (b). -->
+    </answer>
+    <answer number="1c">
+        <!-- Paste your solution to problem 1, part (c) below this line. --><![CDATA[
+
+            SELECT A.i, B.j, SUM(A.val * B.val) AS val FROM A JOIN B ON A.j = B.i GROUP BY A.i, B.j;
+
+        ]]><!-- End problem 1, part (c). -->
+    </answer>
+    <answer number="1d">
+        <!-- Paste your solution to problem 1, part (d) below this line. --><![CDATA[
+
+            SELECT A.i, B.j, SUM(A.val * B.val) AS val 
+            FROM (
+                SELECT A1.i, A2.j, SUM(A1.val * A2.val) AS val 
+                FROM A AS A1 JOIN A AS A2 ON A1.j = A2.i 
+                GROUP BY A1.i, A2.j) 
+                AS B 
+            JOIN A ON A.j = B.i
+            GROUP BY A.i, B.j
+
+        ]]><!-- End problem 1, part (d). -->
+    </answer>
+    <!-- END PROBLEM 1 -->
+
+
+    <!-- BEGIN PROBLEM 2 -->
+    <answer number="2a">
+        <!-- Paste your solution to problem 2, part (a) below this line. --><![CDATA[
+
+            SELECT temp.Store, MAX(temp.Sales) as AllSales
+                FROM (
+                    SELECT Sales.Store, SUM(Sales.WeeklySales) AS Sales
+                    FROM Sales, Holidays
+                    WHERE Sales.WeekDate = Holidays.WeekDate
+                    AND Holidays.IsHoliday = 'TRUE'
+                    GROUP BY Sales.Store) temp
+
+        ]]><!-- End problem 2, part (a). -->
+    </answer>
+    <answer number="2b">
+        <!-- Paste your solution to problem 2, part (b) below this line. --><![CDATA[
+
+            WITH 
+                AvgHolidayWeeklySale(AvgSale) AS
+                (SELECT AVG(HolidaySalesPerWeek.WeeklySales)
+                FROM (
+                    SELECT SUM(Sales.WeeklySales) AS WeeklySales
+                    FROM Sales, Holidays
+                    WHERE Sales.WeekDate = Holidays.WeekDate
+                    AND Holidays.IsHoliday = 'TRUE'
+                    GROUP BY Sales.WeekDate) HolidaySalesPerWeek),
+                
+                NonHolidayWeeklySale(WeeklySales) AS
+                (SELECT SUM(Sales.WeeklySales)
+                FROM Sales, Holidays
+                WHERE Sales.WeekDate = Holidays.WeekDate
+                AND Holidays.IsHoliday = 'FALSE'
+                GROUP BY Sales.WeekDate)
+                
+            SELECT COUNT(*) AS NumNonHolidays
+            FROM NonHolidayWeeklySale, AvgHolidayWeeklySale
+            WHERE NonHolidayWeeklySale.WeeklySales > AvgHolidayWeeklySale.AvgSale
+
+        ]]><!-- End problem 2, part (b). -->
+    </answer>
+    <answer number="2c">
+        <!-- Paste your solution to problem 2, part (c) below this line. --><![CDATA[
+
+            SELECT Stores.Type AS type, SUM(Sales.WeeklySales) AS TotalSales
+            FROM Stores
+            JOIN Sales ON Sales.Store = Stores.Store
+            WHERE Sales.WeekDate LIKE "%06___" OR
+                Sales.WeekDate LIKE "%07___" OR
+                Sales.WeekDate LIKE "%08___"
+            GROUP BY type
+
+        ]]><!-- End problem 2, part (c). -->
+    </answer>
+    <!-- END PROBLEM 2 -->
+
+
+    <!-- BEGIN PROBLEM 3 -->
+    <answer number="3a">
+        <!-- Paste your solution to problem 3, part (a) below this line. --><![CDATA[
+
+            SELECT S1.B AS company, S1.d AS distance
+            FROM Streets S1
+            WHERE S1.A LIKE "%UW-Madison%"
+            AND distance <= 9
+
+            UNION
+
+            SELECT S2.B AS company, MIN(S1.d + S2.d) AS distance
+            FROM Streets S1, Streets s2
+            WHERE S1.A LIKE "%UW-Madison%"
+            AND S1.B = S2.A
+            AND S1.A <> S2.B
+            GROUP BY company
+            HAVING distance <= 9
+
+            UNION
+
+            SELECT S3.B AS company, MIN(S1.d + S2.d + S3.d) AS distance
+            FROM Streets S1, Streets S2, Streets S3
+            WHERE S1.A LIKE "%UW-Madison%"
+            AND S1.B = S2.A
+            AND S2.B = S3.A
+            AND S1.A <> S2.B
+            AND S1.A <> S3.B
+            AND S2.A <> S3.B
+            GROUP BY company
+            HAVING distance <= 9;
+
+        ]]><!-- End problem 3, part (a). -->
+    </answer>
+    <answer number="3b">
+        <!-- Paste your solution to problem 3, part (b) below this line. --><![CDATA[
+
+            DROP VIEW IF EXISTS TwoHopsFromMadison;
+            CREATE VIEW TwoHopsFromMadison AS 
+            SELECT S1.B AS company, S1.d AS distance
+            FROM Streets S1
+            WHERE S1.A LIKE "%UW-Madison%"
+            AND distance <= 15
+
+            UNION
+
+            SELECT S2.B AS company, MIN(S1.d + S2.d) AS distance
+            FROM Streets S1, Streets S2
+            WHERE S1.A LIKE "%UW-Madison%"
+            AND S1.B = S2.A
+            AND S1.A <> S2.B
+            GROUP BY company
+            HAVING distance <= 15;
+
+            SELECT M1.company AS company_1, M2.company AS company_2, MIN(M1.distance + M2.distance) AS distance
+            FROM TwoHopsFromMadison AS M1, TwoHopsFromMadison AS M2
+            WHERE company_1 > company_2
+            GROUP BY company_1, company_2
+            HAVING MIN(M1.distance + M2.distance) <= 15
+
+        ]]><!-- End problem 3, part (b). -->
+    </answer>
+    <answer number="3c">
+        <!-- Paste your solution to problem 3, part (c) below this line. --><![CDATA[
+
+            SELECT S1.A AS A, S2.A AS B, S3.A AS C, (S1.d + S2.d + S3.d) AS distance
+            FROM Streets AS S1, Streets AS S2, Streets AS S3
+            WHERE S1.B = S2.A
+            AND S2.B = S3.A
+            AND S3.B = S1.A
+            AND S1.id < S2.id
+            AND S2.id < S3.id;
+
+        ]]><!-- End problem 3, part (c). -->
+    </answer>
+    <!-- END PROBLEM 3 -->
+
+</pset>

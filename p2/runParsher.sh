@@ -1,0 +1,1 @@
+python3 complete_parser.py ./ebay_data/items-*.json
