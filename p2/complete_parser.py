@@ -70,7 +70,8 @@ def transformDollar(money):
     return sub(r'[^\d.]', '', money)
 
 """
-My Helper Function for handling strings
+My Helper Function for handling strings.
+Written by Nott Laoaroon
 """
 def str_correct_quotation(s):
     return '"'+s.replace('"','""')+'"'
@@ -84,9 +85,7 @@ def good_str(s):
     return s
 
 """
-Parses a single json file. Currently, there's a loop that iterates over each
-item in the data set. Your job is to extend this functionality to create all
-of the necessary SQL tables for your database.
+Written by Nott Laoaroon
 """
 
 def parseJson(json_file):
@@ -138,11 +137,6 @@ def parseJson(json_file):
         """
         
         for row in itemss:
-            """
-            TODO: traverse the items dictionary to extract information from the
-            given `json_file' and generate the necessary .dat files to generate
-            the SQL tables based on your relation design
-            """
             
             # Add to Seller
             sellers.add(good_str(row['Seller']['UserID'])+'|'+
